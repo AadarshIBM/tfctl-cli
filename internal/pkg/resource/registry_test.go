@@ -80,6 +80,31 @@ func TestByName(t *testing.T) {
 			input:    "cv",
 			wantType: "configuration-versions",
 		},
+		{
+			name:     "provider sets canonical",
+			input:    "provider-sets",
+			wantType: "provider-sets",
+		},
+		{
+			name:     "provider set alias",
+			input:    "provider-set",
+			wantType: "provider-sets",
+		},
+		{
+			name:     "provider set short alias",
+			input:    "provset",
+			wantType: "provider-sets",
+		},
+		{
+			name:     "provider sets mixed case",
+			input:    "Provider-Sets",
+			wantType: "provider-sets",
+		},
+		{
+			name:     "provider set uppercase alias",
+			input:    "PROVSET",
+			wantType: "provider-sets",
+		},
 	}
 
 	for _, tt := range tests {
@@ -124,6 +149,11 @@ func TestByIDPrefix(t *testing.T) {
 			name:     "cv ID",
 			input:    "cv-abc123",
 			wantType: "configuration-versions",
+		},
+		{
+			name:     "provider set ID",
+			input:    "provset-abc123",
+			wantType: "provider-sets",
 		},
 		{
 			name:    "unknown prefix",
@@ -202,6 +232,9 @@ func TestCompletionNames(t *testing.T) {
 	assert.Contains(t, names, "ws")
 	assert.Contains(t, names, "runs")
 	assert.Contains(t, names, "run")
+	assert.Contains(t, names, "provider-sets")
+	assert.Contains(t, names, "provider-set")
+	assert.Contains(t, names, "provset")
 
 	// Should be longer than Names() since it includes aliases.
 	assert.Greater(t, len(names), len(Names()))
@@ -218,11 +251,32 @@ func TestCreatableNames(t *testing.T) {
 	assert.Contains(t, names, "workspaces")
 	assert.Contains(t, names, "workspace")
 	assert.Contains(t, names, "projects")
+	assert.Contains(t, names, "provider-sets")
+	assert.Contains(t, names, "provider-set")
+	assert.Contains(t, names, "provset")
 
 	// Should NOT include types without PathCreate (e.g. runs, applies).
 	assert.NotContains(t, names, "runs")
 	assert.NotContains(t, names, "run")
 	assert.NotContains(t, names, "applies")
+}
+
+func TestProviderSetsResource(t *testing.T) {
+	t.Parallel()
+
+	got := ByName("provider-sets")
+	require.NotNil(t, got)
+	assert.Equal(t, &Resource{
+		Type:           "provider-sets",
+		Aliases:        []string{"provider-set", "provset"},
+		IDPrefix:       "provset-",
+		PathGet:        "/provider-sets/{id}",
+		PathList:       "/organizations/{organization_name}/provider-sets",
+		PathCreate:     "/organizations/{organization_name}/provider-sets",
+		Columns:        []string{"name", "provider-source", "global", "priority", "updated-at"},
+		ExcludeColumns: []string{"configuration-hcl"},
+		Resolvable:     false,
+	}, got)
 }
 
 // TestRegistryInvariants validates structural invariants that keep the registry

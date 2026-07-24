@@ -95,6 +95,16 @@ var registry = []Resource{
 		Columns:    []string{"name", "kind", "global", "overridable"},
 	},
 	{
+		Type:           "provider-sets",
+		Aliases:        []string{"provider-set", "provset"},
+		IDPrefix:       "provset-",
+		PathGet:        "/provider-sets/{id}",
+		PathList:       "/organizations/{organization_name}/provider-sets",
+		PathCreate:     "/organizations/{organization_name}/provider-sets",
+		Columns:        []string{"name", "provider-source", "global", "priority", "updated-at"},
+		ExcludeColumns: []string{"configuration-hcl"},
+	},
+	{
 		Type:     "vars",
 		Aliases:  []string{"var", "variable", "variables"},
 		IDPrefix: "var-",
